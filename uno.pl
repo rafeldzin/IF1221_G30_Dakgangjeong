@@ -55,3 +55,40 @@ tanyaPemain(X, [PemainH|PemainT]):-
             fail
         ).
 
+% bikin nomor urutan
+noRandom([], []).
+noRandom([Pemain | PemainT], [No-Pemain|SisaRandom]):-
+    random(No),
+    noRandom(PemainT, SisaRandom).
+
+% ngebuang nomor urutannya
+buangNo([], []).
+buangNo([No-Pemain|SisaRandom], [Pemain|SisaPemain]):-
+    buangNo(SisaRandom, SisaPemain).
+
+% mengacak urutan pemain
+acakGiliran(UrutanAwal, UrutanAcak):-
+    noRandom(UrutanAwal, UrutanDenganNo),
+    keysort(UrutanDenganNo, UrutanAcakDenganNo),
+    buangNo(UrutanAcakDenganNo, UrutanAcak).
+
+printUrutanKe([Pemain]):-
+    write(Pemain),
+    write('.').
+
+printUrutanKe([PemainH | PemainT]):-
+    write(PemainH),
+    write(' - '),
+    printUrutanKe(PemainT).
+
+printUrutan(UrutanPemain):-
+    write('Urutan pemain: '),
+    printUrutanKe(UrutanPemain),
+    nl.
+
+startGame:-
+    inputJumlahPemain(JumlahPemain),
+    tanyaPemain(JumlahPemain, DaftarPemain),
+    acakGiliran(DaftarPemain, UrutanPemain),
+    printUrutan(UrutanPemain).
+    
