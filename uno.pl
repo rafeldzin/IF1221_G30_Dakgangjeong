@@ -1,3 +1,29 @@
+%Buat minta jumlah pemain
+inputJumlahPemain(X):-
+    write('Masukkan jumlah pemain: '),
+    read(Input),
+    validasiJumlahPemain(X, Input).
+
+%Validasi agar jumlah pemainnya sesuai aturan (2 ampe 4)
+validasiJumlahPemain(X, Input):-
+    Input >= 2,
+    Input =< 4,
+    !,
+    X = Input.
+
+
+validasiJumlahPemain(X, Input):-
+    Input < 2,
+    write('Mohon masukkan angka antara 2 - 4.'), nl,
+    inputJumlahPemain(X).
+    
+
+validasiJumlahPemain(X, Input):-
+    Input > 4,
+    write('Mohon masukkan angka antara 2 - 4.'), nl,
+    inputJumlahPemain(X).
+
+
 % Buat mastiin nama yang diinput berbeda
 cekPemainUnik(Pemain, 1, [DaftarH]):-
     Pemain \= DaftarH.
@@ -28,3 +54,4 @@ tanyaPemain(X, [PemainH|PemainT]):-
             write('Nama sudah digunakan. Masukkan nama lain!'), nl,
             fail
         ).
+
