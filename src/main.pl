@@ -1,3 +1,5 @@
+:- include('facts.pl').
+
 %Buat minta jumlah pemain
 inputJumlahPemain(X):-
     write('Masukkan jumlah pemain: '),
