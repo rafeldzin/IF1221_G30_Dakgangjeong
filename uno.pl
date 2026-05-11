@@ -72,6 +72,7 @@ acakGiliran(UrutanAwal, UrutanAcak):-
     keysort(UrutanDenganNo, UrutanAcakDenganNo),
     buangNo(UrutanAcakDenganNo, UrutanAcak).
 
+% ngeprint per pemainnya
 printUrutanKe([Pemain]):-
     write(Pemain),
     write('.').
@@ -81,11 +82,14 @@ printUrutanKe([PemainH | PemainT]):-
     write(' - '),
     printUrutanKe(PemainT).
 
+% ngeprint urutan pemain
 printUrutan(UrutanPemain):-
     write('Urutan pemain: '),
     printUrutanKe(UrutanPemain),
     nl.
 
+
+% MAIN
 startGame:-
     inputJumlahPemain(JumlahPemain),
     tanyaPemain(JumlahPemain, DaftarPemain),
