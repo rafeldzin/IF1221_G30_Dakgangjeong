@@ -1,5 +1,7 @@
-:- include('facts.pl').
-:- include('inisiasi.pl').
+:- [facts.pl].
+:- [inisiasi.pl].
+:- [deck.pl].
+:- [ambil.pl]
 
 % MAIN
 startGame:-
