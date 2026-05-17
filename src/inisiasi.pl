@@ -1,3 +1,5 @@
+:- include('deck.pl').
+
 %Buat minta jumlah pemain
 inputJumlahPemain(X):-
     write('Masukkan jumlah pemain: '),
@@ -6,20 +8,14 @@ inputJumlahPemain(X):-
 
 %Validasi agar jumlah pemainnya sesuai aturan (2 ampe 4)
 validasiJumlahPemain(X, Input):-
+    integer(Input),
     Input >= 2,
     Input =< 4,
     !,
     X = Input.
 
 
-validasiJumlahPemain(X, Input):-
-    Input < 2,
-    write('Mohon masukkan angka antara 2 - 4.'), nl,
-    inputJumlahPemain(X).
-    
-
-validasiJumlahPemain(X, Input):-
-    Input > 4,
+validasiJumlahPemain(X, _Input):-
     write('Mohon masukkan angka antara 2 - 4.'), nl,
     inputJumlahPemain(X).
 
@@ -87,3 +83,17 @@ printUrutan(UrutanPemain):-
     write('Urutan pemain: '),
     printUrutanKe(UrutanPemain),
     nl.
+
+ambil_n_kartu(0, []).
+ambil_n_kartu(N, [Kartu | SisaKartu]) :-
+    N > 0,
+    pullKartu(Kartu),
+    N1 is N - 1,          
+    ambil_n_kartu(N1, SisaKartu).
+
+bagi_kartu_semua([]).
+bagi_kartu_semua([Pemain | SisaPemain]) :-
+    jumlah_card_awal(Jumlah),
+    ambil_n_kartu(Jumlah, ListKartuPemain),
+    asserta(kartu_pemain(Pemain, ListKartuPemain)),
+    bagi_kartu_semua(SisaPemain).
