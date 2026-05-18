@@ -5,6 +5,7 @@
 :- dynamic(kartu_pemain/2).
 :- dynamic(warna_aktif/1).
 :- dynamic(status_uni/1).
-
+:- dynamic(pemain_sebelumnya/1).
+:- dynamic(warna_sebelumnya/1).
 jumlah_card_awal(7).
 batasPemain(2,4).

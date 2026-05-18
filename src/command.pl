@@ -71,15 +71,52 @@ mainkanKartu(X) :-
             retract(kartu_pemain(Pemain, ListKartu)),
             asserta(kartu_pemain(Pemain, SisaKartu)),
             
+            warna_aktif(WarnaLama),
+            retractall(warna_sebelumnya(_)),
+            asserta(warna_sebelumnya(WarnaLama)),
+            
+            retractall(pemain_sebelumnya(_)),
+            asserta(pemain_sebelumnya(Pemain)),
+            
             retract(discard_pile(_)),
             asserta(discard_pile(KartuPilihan)),
-            retract(warna_aktif(_)),
-            asserta(warna_aktif(Warna)),
             
-            nl, write(Pemain), write(' memainkan kartu: '), write(Warna), write('-'), write(Jenis), write('.'), nl,
+            ( Warna == hitam ->
+                nl, write('Kamu mengeluarkan kartu spesial!'), nl,
+                repeat,
+                    write('Pilih warna aktif baru (merah/kuning/hijau/biru): '),
+                    read(WarnaBaru),
+                    ( member(WarnaBaru, [merah, kuning, hijau, biru]) ->
+                        true, !
+                    ;
+                        write('Warna tidak valid! Ketik dengan huruf kecil, contoh: merah.'), nl, fail
+                    ),
+                retractall(warna_aktif(_)),
+                asserta(warna_aktif(WarnaBaru)),
+                nl, write(Pemain), write(' memainkan kartu: hitam-'), write(Jenis), nl,
+                write(Pemain), write(' mengubah warna aktif menjadi: '), write(WarnaBaru), write('.'), nl
+            ;
+                retractall(warna_aktif(_)),
+                asserta(warna_aktif(Warna)),
+                nl, write(Pemain), write(' memainkan kartu: '), write(Warna), write('-'), write(Jenis), write('.'), nl
+            ),
             
+            ( Jenis == skip ->
+                pindahGiliran_skip
+            ; Jenis == reverse ->
+                balikArah,
+                pindahGiliran
+            ; Jenis == drawtwo ->
+    
+                aplikasi_draw_two,
+                pindahGiliran_skip
+          ; Jenis == wildd4 ->
+                aplikasi_wild_draw_four,
+                pindahGiliran
+            ;
+                pindahGiliran
+            )
             
-            nl, pindahGiliran
         ;
             nl, write('Kartu tidak valid! Warna atau jenisnya tidak cocok dengan kartu di meja.'), nl
         )
@@ -95,3 +132,42 @@ hapus_kartu_index(N, [Head|Tail], [Head|TailSisa]) :-
     N > 1,
     N1 is N - 1,
     hapus_kartu_index(N1, Tail, TailSisa).
+    
+balikArah :-
+    arah_permainan(ArahSaatIni),
+    ( ArahSaatIni == kanan -> ArahBaru = kiri ; ArahBaru = kanan ),
+    retract(arah_permainan(ArahSaatIni)),
+    asserta(arah_permainan(ArahBaru)),
+    write('Arah permainan berbalik menjadi '), write(ArahBaru), write('!'), nl.
+
+pindahGiliran_skip :-
+    giliran_sekarang(PemainSekarang),
+    urutan_pemain(ListPemain),
+    cari_next_sesuai_arah(PemainSekarang, ListPemain, KorbanSkip),
+    cari_next_sesuai_arah(KorbanSkip, ListPemain, PemainAsli),
+    retract(giliran_sekarang(PemainSekarang)),
+    asserta(giliran_sekarang(PemainAsli)),
+    nl, write(KorbanSkip), write(' dilewati! Sekarang giliran '), write(PemainAsli), write('.'), nl.
+
+aplikasi_draw_two :-
+    urutan_pemain(ListPemain),
+    giliran_sekarang(PemainSekarang),
+    cari_next_sesuai_arah(PemainSekarang, ListPemain, Korban),
+    nl, write('*** EFEK DRAW TWO! ***'), nl,
+    write(Korban), write(' harus mengambil 2 kartu penalti!'), nl,
+    ambil_n_kartu(Korban, 2).
+
+aplikasi_wild_draw_four :-
+    urutan_pemain(ListPemain),
+    giliran_sekarang(PemainSekarang),
+    cari_next_sesuai_arah(PemainSekarang, ListPemain, Korban),
+    nl, write('*** EFEK WILD DRAW FOUR! ***'), nl,
+    write(Korban), write(' dapat mengetikkan "tantang." atau otomatis mengambil 4 kartu di gilirannya.'), nl.
+
+cari_next_sesuai_arah(Pemain, ListPemain, NextPemain) :-
+    ( arah_permainan(kiri) ->
+        reverse(ListPemain, ListReversed),
+        next_player(Pemain, ListReversed, NextPemain)
+    ;
+        next_player(Pemain, ListPemain, NextPemain)
+    ).
