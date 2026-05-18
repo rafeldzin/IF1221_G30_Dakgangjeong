@@ -30,10 +30,26 @@ cekPemainUnik(Pemain, X, [DaftarH|DaftarT]):-
     X1 is X - 1,
     cekPemainUnik(Pemain, X1, DaftarT).
 
+
+
+cekHurufBesar(Input) :-
+    \+ var(Input),
+    atom(Input),
+    atom_codes(Input, [HurufPertama | _]),
+    HurufPertama >= 65,
+    HurufPertama =< 90.
+
 % Buat nanya nama pemain
 tanyaPemain(1, [Pemain1]):-
-    write('Masukkan nama pemain 1: '),
-    read(Pemain1).
+    repeat,
+        write('Masukkan nama pemain 1: '),
+        read(Input),
+        ( cekHurufBesar(Input) ->
+                Pemain1 = Input, !
+            ;
+                write('Nama harus diawali huruf besar dan diapit tanda kutip tunggal.'), nl,
+                fail
+            ).
 
 tanyaPemain(X, [PemainH|PemainT]):-
     X > 1,
@@ -42,13 +58,20 @@ tanyaPemain(X, [PemainH|PemainT]):-
 
     repeat,
         write('Masukkan nama pemain '), write(X), write(': '),
-        read(Input), 
+        read(Input),
         
-        ( cekPemainUnik(Input, X1, PemainT) ->
-            PemainH = Input, !
-        ;
-            write('Nama sudah digunakan. Masukkan nama lain!'), nl,
+        
+        (   \+ cekHurufBesar(Input) ->
+            write('Nama harus diawali huruf besar dan diapit tanda kutip tunggal.'), nl,
             fail
+            
+        ;   cekPemainUnik(Input, X1, PemainT) ->
+            PemainH = Input, !
+
+        ;   \+ cekPemainUnik(Input, X1, PemainT) ->
+            write('Nama sudah digunakan. Masukkan nama lain!'), nl,
+            fail;
+            PemainH = Input, !
         ).
 
 % bikin nomor urutan
