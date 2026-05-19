@@ -1,4 +1,3 @@
-:- include('facts.pl').
 :- include('inisiasi.pl').
 :- include('ambil.pl').
 :- include('command.pl').
@@ -17,5 +16,6 @@ startGame:-
     pullKartu(KartuAwal),
     KartuAwal = kartu(WarnaAwal, _),
     asserta(discard_pile(KartuAwal)),
-    asserta(warna_aktif(WarnaAwal)).
+    asserta(warna_aktif(WarnaAwal)),
+    asserta(arah_permainan(kanan)).
     

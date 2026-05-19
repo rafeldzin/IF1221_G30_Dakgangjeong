@@ -1,8 +1,5 @@
 ambilKartu :-
     giliran_sekarang(Pemain),
-    ( deck_utama([]) -> 
-        write('Deck habis! Mengocok ulang tumpukan...'), nl,
-        daurUlangDeck ;  true ),
     pull_kartu(Kartu),
     prosesAmbil(Pemain, Kartu).
 

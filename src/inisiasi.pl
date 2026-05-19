@@ -82,7 +82,7 @@ noRandom([Pemain | PemainT], [No-Pemain|SisaRandom]):-
 
 % ngebuang nomor urutannya
 buangNo([], []).
-buangNo([No-Pemain|SisaRandom], [Pemain|SisaPemain]):-
+buangNo([_-Pemain|SisaRandom], [Pemain|SisaPemain]):-
     buangNo(SisaRandom, SisaPemain).
 
 % mengacak urutan pemain
@@ -107,16 +107,16 @@ printUrutan(UrutanPemain):-
     printUrutanKe(UrutanPemain),
     nl.
 
-ambil_n_kartu(0, []).
-ambil_n_kartu(N, [Kartu | SisaKartu]) :-
+siapkan_n_kartu(0, []).
+siapkan_n_kartu(N, [Kartu | SisaKartu]) :-
     N > 0,
     pullKartu(Kartu),
     N1 is N - 1,          
-    ambil_n_kartu(N1, SisaKartu).
+    siapkan_n_kartu(N1, SisaKartu).
 
 bagi_kartu_semua([]).
 bagi_kartu_semua([Pemain | SisaPemain]) :-
     jumlah_card_awal(Jumlah),
-    ambil_n_kartu(Jumlah, ListKartuPemain),
+    siapkan_n_kartu(Jumlah, ListKartuPemain),
     asserta(kartu_pemain(Pemain, ListKartuPemain)),
     bagi_kartu_semua(SisaPemain).

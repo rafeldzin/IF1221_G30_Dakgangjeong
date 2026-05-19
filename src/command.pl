@@ -70,6 +70,10 @@ mainkanKartu(X) :-
             hapus_kartu_index(X, ListKartu, SisaKartu),
             retract(kartu_pemain(Pemain, ListKartu)),
             asserta(kartu_pemain(Pemain, SisaKartu)),
+
+            warna_aktif(WarnaLama),
+            retractall(warna_sebelumnya(_)), asserta(warna_sebelumnya(WarnaLama)),
+            retractall(pemain_sebelumnya(_)), asserta(pemain_sebelumnya(Pemain)),
             
             retract(discard_pile(_)),
             asserta(discard_pile(KartuPilihan)),
@@ -77,9 +81,7 @@ mainkanKartu(X) :-
             asserta(warna_aktif(Warna)),
             
             nl, write(Pemain), write(' memainkan kartu: '), write(Warna), write('-'), write(Jenis), write('.'), nl,
-            
-            
-            nl, pindahGiliran
+            terapkan_efek(KartuPilihan)
         ;
             nl, write('Kartu tidak valid! Warna atau jenisnya tidak cocok dengan kartu di meja.'), nl
         )
@@ -95,3 +97,72 @@ hapus_kartu_index(N, [Head|Tail], [Head|TailSisa]) :-
     N > 1,
     N1 is N - 1,
     hapus_kartu_index(N1, Tail, TailSisa).
+
+
+% kartu biasa
+terapkan_efek(kartu(_, Jenis)) :-
+    integer(Jenis),
+    pindahGiliran.
+
+% skip
+terapkan_efek(kartu(_, skip)) :-
+    nl, write('Pemain selanjutnya terkena Skip!'), nl,
+    pindahGiliran, pindahGiliran.
+
+% +2
+terapkan_efek(kartu(_, drawtwo)) :-
+    nl, write('Pemain selanjutnya terkena Draw Two!'), nl,
+    pindahGiliran,
+    giliran_sekarang(Korban),
+    ambil_n_kartu(Korban, 2),
+    pindahGiliran.
+
+% wild (kartu hitam)
+terapkan_efek(kartu(hitam, wild)) :-
+    pilihWarnaBaru,
+    pindahGiliran.
+
+% +4
+terapkan_efek(kartu(hitam, wildd4)) :-
+    pilihWarnaBaru,
+    nl, write('Pemain selanjutnya diancam +4! (Ketik "tantang." jika ingin melawan)'), nl,
+    pindahGiliran. 
+
+% milih warna buat efek hitam
+pilihWarnaBaru :-
+    repeat,
+        nl, write('Kartu Wild! Pilih warna baru (merah/kuning/hijau/biru).'), nl,
+        write('Ketik warna pilihanmu: '),
+        read(WarnaBaru),
+        ( member(WarnaBaru, [merah, kuning, hijau, biru]) ->
+            retract(warna_aktif(_)),
+            asserta(warna_aktif(WarnaBaru)),
+            nl, write('Warna telah diubah menjadi '), write(WarnaBaru), write('!'), nl, !
+        ;
+            write('Warna tidak valid!'), nl, fail
+        ).
+
+% reverse
+terapkan_efek(kartu(_, reverse)) :-
+    nl, write('Arah permainan diputar balik!'), nl,
+    ubahArah,
+    pindahGiliran.
+
+ubahArah :-
+    arah_permainan(kanan),
+    retract(arah_permainan(kanan)),
+    asserta(arah_permainan(kiri)), !.
+
+ubahArah :-
+    arah_permainan(kiri),
+    retract(arah_permainan(kiri)),
+    asserta(arah_permainan(kanan)), !.
+
+
+% menambahkan kartu secara custom (buat debugging doang)  
+tambahKartu(Pemain, Warna, Jenis) :-
+    kartu_pemain(Pemain, ListKartu),
+    append(ListKartu, [kartu(Warna, Jenis)], ListBaru),
+    
+    retract(kartu_pemain(Pemain, ListKartu)),
+    asserta(kartu_pemain(Pemain, ListBaru)).
