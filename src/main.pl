@@ -17,5 +17,6 @@ startGame:-
     pullKartu(KartuAwal),
     KartuAwal = kartu(WarnaAwal, _),
     asserta(discard_pile(KartuAwal)),
-    asserta(warna_aktif(WarnaAwal)).
+    asserta(warna_aktif(WarnaAwal)),
+    cekInfo.
     

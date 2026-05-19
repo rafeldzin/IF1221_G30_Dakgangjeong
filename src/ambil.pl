@@ -1,6 +1,6 @@
 ambilKartu :-
     giliran_sekarang(Pemain),
-    pull_kartu(Kartu),
+    pullKartu(Kartu),
     prosesAmbil(Pemain, Kartu).
 
 prosesAmbil(Pemain, Kartu) :-
@@ -8,7 +8,7 @@ prosesAmbil(Pemain, Kartu) :-
     append(KartuLama, [Kartu], KartuBaru),
     retract(kartu_pemain(Pemain, KartuLama)),
     asserta(kartu_pemain(Pemain, KartuBaru)),
-    write(Pemain), write(' mendapatkan kartu.'), nl,
+    write(Pemain), write(' mendapatkan kartu.'), write(KartuBaru), nl,
     pindahGiliran.
 
 pindahGiliran :-
