@@ -1,4 +1,5 @@
 % hitung poin
+hitung_poin_kartu(kartu(_, 0), 1) :- !.
 hitung_poin_kartu(kartu(hitam, _), 20) :- !.
 hitung_poin_kartu(kartu(_, skip), 10) :- !.
 hitung_poin_kartu(kartu(_, reverse), 10) :- !.

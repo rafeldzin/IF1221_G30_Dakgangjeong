@@ -8,6 +8,7 @@ prosesAmbil(Pemain, Kartu) :-
     append(KartuLama, [Kartu], KartuBaru),
     retract(kartu_pemain(Pemain, KartuLama)),
     asserta(kartu_pemain(Pemain, KartuBaru)),
+    retractall(status_uni(Pemain)),
     write(Pemain), write(' mendapatkan '), write(Kartu), nl,
     pindahGiliran.
 
@@ -68,5 +69,7 @@ ambil_n_kartu(Pemain, N) :-
     append(KartuLama, [Kartu], KartuBaru),
     retract(kartu_pemain(Pemain, KartuLama)),
     asserta(kartu_pemain(Pemain, KartuBaru)),
+    retractall(status_uni(Pemain)),
+    write(Pemain), write(' mendapatkan '), write(Kartu), nl,
     N1 is N - 1,
     ambil_n_kartu(Pemain, N1).
