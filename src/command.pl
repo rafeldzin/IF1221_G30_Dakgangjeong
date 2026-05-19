@@ -1,4 +1,6 @@
 :- include('facts.pl').
+:- include('endgame.pl').
+
 lihatCommand :-
     nl,
     write('Aksi utama yang tersedia:'), nl,
@@ -70,6 +72,10 @@ mainkanKartu(X) :-
             hapus_kartu_index(X, ListKartu, SisaKartu),
             retract(kartu_pemain(Pemain, ListKartu)),
             asserta(kartu_pemain(Pemain, SisaKartu)),
+
+            warna_aktif(WarnaLama),
+            retractall(warna_sebelumnya(_)), asserta(warna_sebelumnya(WarnaLama)),
+            retractall(pemain_sebelumnya(_)), asserta(pemain_sebelumnya(Pemain)),
             
             retract(discard_pile(_)),
             asserta(discard_pile(KartuPilihan)),
@@ -77,9 +83,8 @@ mainkanKartu(X) :-
             asserta(warna_aktif(Warna)),
             
             nl, write(Pemain), write(' memainkan kartu: '), write(Warna), write('-'), write(Jenis), write('.'), nl,
-            
-            
-            nl, pindahGiliran
+            cekEndGame,
+            terapkan_efek(KartuPilihan)
         ;
             nl, write('Kartu tidak valid! Warna atau jenisnya tidak cocok dengan kartu di meja.'), nl
         )
@@ -95,3 +100,124 @@ hapus_kartu_index(N, [Head|Tail], [Head|TailSisa]) :-
     N > 1,
     N1 is N - 1,
     hapus_kartu_index(N1, Tail, TailSisa).
+
+
+% kartu biasa
+terapkan_efek(kartu(_, Jenis)) :-
+    integer(Jenis),
+    pindahGiliran.
+
+% skip
+terapkan_efek(kartu(_, skip)) :-
+    nl, write('Pemain selanjutnya terkena Skip!'), nl,
+    pindahGiliran, pindahGiliran.
+
+% +2
+terapkan_efek(kartu(_, drawtwo)) :-
+    nl, write('Pemain selanjutnya terkena Draw Two!'), nl,
+    pindahGiliran,
+    giliran_sekarang(Korban),
+    ambil_n_kartu(Korban, 2),
+    pindahGiliran.
+
+% wild (kartu hitam)
+terapkan_efek(kartu(hitam, wild)) :-
+    pilihWarnaBaru,
+    pindahGiliran.
+
+% +4
+terapkan_efek(kartu(hitam, wildd4)) :-
+    pilihWarnaBaru,
+    nl, write('Pemain selanjutnya diancam +4! (Ketik "tantang." jika ingin melawan)'), nl,
+    pindahGiliran. 
+
+
+% reverse
+terapkan_efek(kartu(_, reverse)) :-
+    nl, write('Arah permainan diputar balik!'), nl,
+    ubahArah,
+    pindahGiliran.
+
+% milih warna buat efek hitam
+pilihWarnaBaru :-
+    repeat,
+        nl, write('Kartu Wild! Pilih warna baru (merah/kuning/hijau/biru).'), nl,
+        write('Ketik warna pilihanmu: '),
+        read(WarnaBaru),
+        ( member(WarnaBaru, [merah, kuning, hijau, biru]) ->
+            retract(warna_aktif(_)),
+            asserta(warna_aktif(WarnaBaru)),
+            nl, write('Warna telah diubah menjadi '), write(WarnaBaru), write('!'), nl, !
+        ;
+            write('Warna tidak valid!'), nl, fail
+        ).
+
+ubahArah :-
+    arah_permainan(kanan),
+    retract(arah_permainan(kanan)),
+    asserta(arah_permainan(kiri)), !.
+
+ubahArah :-
+    arah_permainan(kiri),
+    retract(arah_permainan(kiri)),
+    asserta(arah_permainan(kanan)), !.
+
+
+%mekanika uni
+uni(X) :-
+    giliran_sekarang(Pemain),
+    kartu_pemain(Pemain, ListKartu),
+    length(ListKartu, Jumlah),
+    ( Jumlah =:= 2 ->
+        ( nth1(X, ListKartu, KartuPilihan) ->
+            % Cek apakah kartu itu valid dimainkan di atas discard pile
+            ( validasi_kartu(KartuPilihan) ->
+                asserta(status_uni(Pemain)),
+                nl, write(Pemain), write(' UNI!!!'), nl,
+                mainkanKartu(X) ; nl, write('Kartu tidak valid! Warna atau jenisnya tidak cocok.'), nl) ;
+            nl, write('Nomor kartu tidak valid atau tidak ada di tanganmu.'), nl)
+    ;
+        nl, write('Gagal! Perintah "uni(X)." HANYA bisa digunakan saat kartumu sisa 2.'), nl
+    ).
+
+% menangkap pemain belum uni
+tangkap(Target) :-
+    giliran_sekarang(Penuduh),
+    kartu_pemain(Target, ListKartu),
+    length(ListKartu, Jumlah),
+    (Jumlah =:= 1 ->
+        ( \+ status_uni(Target) ->
+            nl, write('Tangkap BERHASIL! '), write(Target), write(' lupa bilang UNI.'), nl,
+            write(Target), write(' terkena penalti 2 kartu!'), nl,
+            ambil_n_kartu(Target, 2)
+        ;
+            nl, write('Tangkap SALAH! '), write(Target), write(' sudah teriak UNI.'), nl,
+            write(Penuduh), write(' terkena penalti 1 kartu!'), nl,
+            ambil_n_kartu(Penuduh, 1)
+        )
+    ;
+        nl, write('Tangkap SALAH! Kartu milik '), write(Target), write(' tidak berjumlah 1.'), nl,
+        write(Penuduh), write(' terkena penalti 1 kartu!'), nl,
+        ambil_n_kartu(Penuduh, 1)
+    ).
+
+% menambahkan kartu secara custom (buat debugging doang)  
+tambahKartu(Pemain, Warna, Jenis) :-
+    kartu_pemain(Pemain, ListKartu),
+    append(ListKartu, [kartu(Warna, Jenis)], ListBaru),
+    retract(kartu_pemain(Pemain, ListKartu)),
+    asserta(kartu_pemain(Pemain, ListBaru)).
+
+
+%buat debugging (abisin kartu)
+abisinKartu(Pemain):-
+    retractall(kartu_pemain(Pemain, _)),
+    asserta(kartu_pemain(Pemain, [])),
+    nl, write('Kartu '), write(Pemain), write(' telah diset menjadi habis (0)!'), nl,
+    cekEndGame.
+
+% debugging uni
+sisainDuaKartu(Pemain) :-
+    retractall(kartu_pemain(Pemain, _)),
+    asserta(kartu_pemain(Pemain, [kartu(hitam, wild), kartu(hitam, wildd4)])),
+    nl, write('Kartu '), write(Pemain), write(' disisakan 2 kartu!'), nl.

@@ -30,10 +30,26 @@ cekPemainUnik(Pemain, X, [DaftarH|DaftarT]):-
     X1 is X - 1,
     cekPemainUnik(Pemain, X1, DaftarT).
 
+
+
+cekHurufBesar(Input) :-
+    \+ var(Input),
+    atom(Input),
+    atom_codes(Input, [HurufPertama | _]),
+    HurufPertama >= 65,
+    HurufPertama =< 90.
+
 % Buat nanya nama pemain
 tanyaPemain(1, [Pemain1]):-
-    write('Masukkan nama pemain 1: '),
-    read(Pemain1).
+    repeat,
+        write('Masukkan nama pemain 1: '),
+        read(Input),
+        ( cekHurufBesar(Input) ->
+                Pemain1 = Input, !
+            ;
+                write('Nama harus diawali huruf besar dan diapit tanda kutip tunggal.'), nl,
+                fail
+            ).
 
 tanyaPemain(X, [PemainH|PemainT]):-
     X > 1,
@@ -42,13 +58,20 @@ tanyaPemain(X, [PemainH|PemainT]):-
 
     repeat,
         write('Masukkan nama pemain '), write(X), write(': '),
-        read(Input), 
+        read(Input),
         
-        ( cekPemainUnik(Input, X1, PemainT) ->
-            PemainH = Input, !
-        ;
-            write('Nama sudah digunakan. Masukkan nama lain!'), nl,
+        
+        (   \+ cekHurufBesar(Input) ->
+            write('Nama harus diawali huruf besar dan diapit tanda kutip tunggal.'), nl,
             fail
+            
+        ;   cekPemainUnik(Input, X1, PemainT) ->
+            PemainH = Input, !
+
+        ;   \+ cekPemainUnik(Input, X1, PemainT) ->
+            write('Nama sudah digunakan. Masukkan nama lain!'), nl,
+            fail;
+            PemainH = Input, !
         ).
 
 % bikin nomor urutan
@@ -59,7 +82,7 @@ noRandom([Pemain | PemainT], [No-Pemain|SisaRandom]):-
 
 % ngebuang nomor urutannya
 buangNo([], []).
-buangNo([No-Pemain|SisaRandom], [Pemain|SisaPemain]):-
+buangNo([_-Pemain|SisaRandom], [Pemain|SisaPemain]):-
     buangNo(SisaRandom, SisaPemain).
 
 % mengacak urutan pemain
@@ -84,16 +107,16 @@ printUrutan(UrutanPemain):-
     printUrutanKe(UrutanPemain),
     nl.
 
-ambil_n_kartu(0, []).
-ambil_n_kartu(N, [Kartu | SisaKartu]) :-
+siapkan_n_kartu(0, []).
+siapkan_n_kartu(N, [Kartu | SisaKartu]) :-
     N > 0,
     pullKartu(Kartu),
     N1 is N - 1,          
-    ambil_n_kartu(N1, SisaKartu).
+    siapkan_n_kartu(N1, SisaKartu).
 
 bagi_kartu_semua([]).
 bagi_kartu_semua([Pemain | SisaPemain]) :-
     jumlah_card_awal(Jumlah),
-    ambil_n_kartu(Jumlah, ListKartuPemain),
+    siapkan_n_kartu(Jumlah, ListKartuPemain),
     asserta(kartu_pemain(Pemain, ListKartuPemain)),
     bagi_kartu_semua(SisaPemain).
