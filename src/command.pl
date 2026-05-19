@@ -61,38 +61,47 @@ printPemainInfo([PemainH | PemainT], Nomor) :-
     printPemainInfo(PemainT, NomorSelanjutnya).
 
 mainkanKartu(X) :-
-    giliran_sekarang(Pemain),
-    kartu_pemain(Pemain, ListKartu),
-    
-    ( nth1(X, ListKartu, KartuPilihan) ->
-        
-        ( validasi_kartu(KartuPilihan) ->
-            KartuPilihan = kartu(Warna, Jenis),
-            
-            hapus_kartu_index(X, ListKartu, SisaKartu),
-            retract(kartu_pemain(Pemain, ListKartu)),
-            asserta(kartu_pemain(Pemain, SisaKartu)),
-
-            warna_aktif(WarnaLama),
-            retractall(warna_sebelumnya(_)), asserta(warna_sebelumnya(WarnaLama)),
-            retractall(pemain_sebelumnya(_)), asserta(pemain_sebelumnya(Pemain)),
-            
-            retract(discard_pile(_)),
-            asserta(discard_pile(KartuPilihan)),
-            retract(warna_aktif(_)),
-            asserta(warna_aktif(Warna)),
-            
-            nl, write(Pemain), write(' memainkan kartu: '), write(Warna), write('-'), write(Jenis), write('.'), nl,
-            cekEndGame,
-            terapkan_efek(KartuPilihan)
-        ;
-            nl, write('Kartu tidak valid! Warna atau jenisnya tidak cocok dengan kartu di meja.'), nl
-        )
+    ( status_plus4(aktif) ->
+        nl, write('Anda sedang terkena efek +4! Anda HANYA BISA mengetik "tantang." atau "ambilKartu."'), nl
     ;
-        nl, write('Nomor kartu tidak valid atau tidak ada di tanganmu.'), nl
+        giliran_sekarang(Pemain),
+        kartu_pemain(Pemain, ListKartu),
+        
+        ( nth1(X, ListKartu, KartuPilihan) ->
+            
+            ( validasi_kartu(KartuPilihan) ->
+                KartuPilihan = kartu(Warna, Jenis),
+                
+                hapus_kartu_index(X, ListKartu, SisaKartu),
+                retract(kartu_pemain(Pemain, ListKartu)),
+                asserta(kartu_pemain(Pemain, SisaKartu)),
+
+                warna_aktif(WarnaLama),
+                discard_pile(kartu(_, JenisLama)),
+                retractall(warna_sebelumnya(_)), asserta(warna_sebelumnya(WarnaLama)),
+                retractall(jenis_sebelumnya(_)), asserta(jenis_sebelumnya(JenisLama)),
+                retractall(pemain_sebelumnya(_)), asserta(pemain_sebelumnya(Pemain)),
+                
+                retract(discard_pile(_)),
+                asserta(discard_pile(KartuPilihan)),
+                retract(warna_aktif(_)),
+                asserta(warna_aktif(Warna)),
+                
+                nl, write(Pemain), write(' memainkan kartu: '), write(Warna), write('-'), write(Jenis), write('.'), nl,
+                cekEndGame,
+                terapkan_efek(KartuPilihan)
+            ;
+                nl, write('Kartu tidak valid! Warna atau jenisnya tidak cocok dengan kartu di meja.'), nl
+            )
+        ;
+            nl, write('Nomor kartu tidak valid atau tidak ada di tanganmu.'), nl
+        )
     ).
 
-validasi_kartu(kartu(Warna, _)) :- warna_aktif(Warna).
+validasi_kartu(kartu(_, drawtwo)):- discard_pile(kartu(_, drawtwo)), !, fail.
+validasi_kartu(kartu(hitam, wild)):- discard_pile(kartu(hitam, wild)), !, fail.
+validasi_kartu(kartu(hitam, wildd4)):- discard_pile(kartu(hitam, wildd4)), !, fail.
+validasi_kartu(kartu(Warna, _)):- warna_aktif(Warna).
 validasi_kartu(kartu(_, Jenis)) :- discard_pile(kartu(_, Jenis)).
 validasi_kartu(kartu(hitam, _)).
 hapus_kartu_index(1, [_|Tail], Tail) :- !.
@@ -128,8 +137,9 @@ terapkan_efek(kartu(hitam, wild)) :-
 % +4
 terapkan_efek(kartu(hitam, wildd4)) :-
     pilihWarnaBaru,
-    nl, write('Pemain selanjutnya diancam +4! (Ketik "tantang." jika ingin melawan)'), nl,
-    pindahGiliran. 
+    nl, write('PERINGATAN: Pemain selanjutnya diancam +4! (Ketik "tantang." atau "ambilKartu.")'), nl,
+    retractall(status_plus4(_)), asserta(status_plus4(aktif)),
+    pindahGiliran.
 
 
 % reverse
@@ -141,13 +151,11 @@ terapkan_efek(kartu(_, reverse)) :-
 % milih warna buat efek hitam
 pilihWarnaBaru :-
     repeat,
-        nl, write('Kartu Wild! Pilih warna baru (merah/kuning/hijau/biru).'), nl,
-        write('Ketik warna pilihanmu: '),
+        nl, write('Silahkan memilih warna: '),
         read(WarnaBaru),
         ( member(WarnaBaru, [merah, kuning, hijau, biru]) ->
             retract(warna_aktif(_)),
-            asserta(warna_aktif(WarnaBaru)),
-            nl, write('Warna telah diubah menjadi '), write(WarnaBaru), write('!'), nl, !
+            asserta(warna_aktif(WarnaBaru)), nl, !
         ;
             write('Warna tidak valid!'), nl, fail
         ).

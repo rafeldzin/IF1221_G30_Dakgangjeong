@@ -1,7 +1,13 @@
 ambilKartu :-
     giliran_sekarang(Pemain),
-    pullKartu(Kartu),
-    prosesAmbil(Pemain, Kartu).
+    ( status_plus4(aktif) ->
+        retractall(status_plus4(_)),
+        ambil_n_kartu(Pemain, 4),
+        pindahGiliran
+    ;
+        pullKartu(Kartu),
+        prosesAmbil(Pemain, Kartu)
+    ).
 
 prosesAmbil(Pemain, Kartu) :-
     kartu_pemain(Pemain, KartuLama),
@@ -27,35 +33,33 @@ next_player(X, [_|Tail], Next) :-
 
 tantang :-
     giliran_sekarang(Penantang),
-    discard_pile(KartuAtas),
     
-    % cek apa kartu atasnya adalah Wild Draw Four
-  
-    ( KartuAtas == kartu(hitam, wildd4) ->
-        
+    ( status_plus4(aktif) ->
         pemain_sebelumnya(Pembuang),
         warna_sebelumnya(WarnaLama),
+        jenis_sebelumnya(JenisLama),
         kartu_pemain(Pembuang, ListKartuPembuang),
         
-        % cek apakah si pembuang punya kartu dengan WarnaLama
-        ( cek_punya_warna(WarnaLama, ListKartuPembuang) ->
+        nl, write('Tantangan dilakukan!'), nl,
+        write('Memeriksa kartu '), write(Pembuang), write('...'), nl, nl,
+        
+        ( cek_punya_kecocokan(WarnaLama, JenisLama, ListKartuPembuang) ->
             
-            % TANTANGAN BERHASIL
-            nl, write('Tantangan BERHASIL! '), write(Pembuang), write(' menyembunyikan warna yang cocok.'), nl,
-            write(Pembuang), write(' terkena penalti 4 kartu!'), nl,
+            % tantangan berhasil
+            write('Tantangan berhasil. '), write(Pembuang), write(' mendapatkan 4 kartu acak.'), nl,
+            retractall(status_plus4(_)),
             ambil_n_kartu(Pembuang, 4)
-            % Giliran tetap milik penantang (tidak usah panggil pindahGiliran)
+            % Gilirannya tetep penantang, sekarang dia bebas mau mainkanKartu atau ambilKartu
             
         ;
-            % TANTANGAN GAGAL
-            nl, write('Tantangan GAGAL! '), write(Pembuang), write(' bermain jujur.'), nl,
-            write(Penantang), write(' terkena penalti 6 kartu (4 + 2 denda)!'), nl,
+            % tantangan gagal
+            write('Tantangan gagal. '), write(Penantang), write(' mendapatkan 6 kartu acak.'), nl,
+            retractall(status_plus4(_)),
             ambil_n_kartu(Penantang, 6),
-            pindahGiliran % Giliran penantang hangus karena kalah tantangan
+            pindahGiliran
         )
     ;
-        % Jika kartu atasnya bukan Wild Draw Four
-        nl, write('Tantang tidak valid! Kartu terakhir bukan Wild Draw Four.'), nl
+        nl, write('Tantang tidak valid! Tidak ada kartu +4 yang bisa ditantang saat ini.'), nl
     ).
 
 cek_punya_warna(Warna, [kartu(Warna, _) | _]) :- !.
@@ -73,3 +77,7 @@ ambil_n_kartu(Pemain, N) :-
     write(Pemain), write(' mendapatkan '), write(Kartu), nl,
     N1 is N - 1,
     ambil_n_kartu(Pemain, N1).
+
+cek_punya_kecocokan(Warna, _, [kartu(Warna, _) | _]) :- Warna \= hitam, !.
+cek_punya_kecocokan(_, Jenis, [kartu(_, Jenis) | _]) :- !.
+cek_punya_kecocokan(Warna, Jenis, [_ | SisaKartu]) :- cek_punya_kecocokan(Warna, Jenis, SisaKartu).

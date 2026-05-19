@@ -8,5 +8,7 @@
 :- dynamic(warna_sebelumnya/1).
 :- dynamic(deck_utama/1).
 :- dynamic(status_uni/1).
+:- dynamic(jenis_sebelumnya/1).
+:- dynamic(status_plus4/1).
 jumlah_card_awal(7).
 batasPemain(2,4).
