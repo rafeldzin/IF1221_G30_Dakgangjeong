@@ -4,13 +4,16 @@
 lihatCommand :-
     nl,
     write('Aksi utama yang tersedia:'), nl,
-    write('1. ambilKartu'), nl,
-    write('2. tantang'), nl,
+    write('1. ambilKartu. -> draw kartu'), nl,
+    write('2. mainkanKartu(slot). -> memainkan kartu dari tanganmu'), nl,
+    write('3. uni(slot). -> melantangkan "uni" jika kartu bersisa 1'), nl,
+    write('4. tangkap(player). -> menuduh player tidak mengatakan uni'), nl,
+    write('5. tantang. -> menghindari kartu draw'), nl,
     nl,
     write('Aksi pendukung yang tersedia:'), nl,
-    write('1. lihatCommand'), nl,
-    write('2. lihatKartu'), nl,
-    write('3. cekInfo'), nl,
+    write('1. lihatCommand.'), nl,
+    write('2. lihatKartu.'), nl,
+    write('3. cekInfo.'), nl,
     nl.
 
 
@@ -47,7 +50,7 @@ cekInfo :-
     printPemainInfo(Urutan, 1).
 
 printUrutanInfo([Pemain]) :- 
-    write(Pemain), write('.').
+    write(Pemain), write('.'), !.
 printUrutanInfo([PemainH | PemainT]) :- 
     write(PemainH), write(' - '), printUrutanInfo(PemainT).
 
@@ -82,14 +85,14 @@ mainkanKartu(X) :-
                 retractall(jenis_sebelumnya(_)), asserta(jenis_sebelumnya(JenisLama)),
                 retractall(pemain_sebelumnya(_)), asserta(pemain_sebelumnya(Pemain)),
                 
-                retract(discard_pile(_)),
+                retractall(discard_pile(_)),
                 asserta(discard_pile(KartuPilihan)),
-                retract(warna_aktif(_)),
+                retractall(warna_aktif(_)),
                 asserta(warna_aktif(Warna)),
                 
                 nl, write(Pemain), write(' memainkan kartu: '), write(Warna), write('-'), write(Jenis), write('.'), nl,
                 cekEndGame,
-                terapkan_efek(KartuPilihan)
+                terapkan_efek(KartuPilihan), !
             ;
                 nl, write('Kartu tidak valid! Warna atau jenisnya tidak cocok dengan kartu di meja.'), nl
             )
@@ -98,12 +101,9 @@ mainkanKartu(X) :-
         )
     ).
 
-validasi_kartu(kartu(_, drawtwo)):- discard_pile(kartu(_, drawtwo)), !, fail.
-validasi_kartu(kartu(hitam, wild)):- discard_pile(kartu(hitam, wild)), !, fail.
-validasi_kartu(kartu(hitam, wildd4)):- discard_pile(kartu(hitam, wildd4)), !, fail.
-validasi_kartu(kartu(Warna, _)):- warna_aktif(Warna).
-validasi_kartu(kartu(_, Jenis)) :- discard_pile(kartu(_, Jenis)).
-validasi_kartu(kartu(hitam, _)).
+validasi_kartu(kartu(Warna, _)):- warna_aktif(Warna), !.
+validasi_kartu(kartu(_, Jenis)) :- discard_pile(kartu(_, Jenis)), !.
+validasi_kartu(kartu(hitam, _)):- !.
 hapus_kartu_index(1, [_|Tail], Tail) :- !.
 hapus_kartu_index(N, [Head|Tail], [Head|TailSisa]) :-
     N > 1,
@@ -182,7 +182,7 @@ uni(X) :-
             ( validasi_kartu(KartuPilihan) ->
                 asserta(status_uni(Pemain)),
                 nl, write(Pemain), write(' UNI!!!'), nl,
-                mainkanKartu(X) ; nl, write('Kartu tidak valid! Warna atau jenisnya tidak cocok.'), nl) ;
+                mainkanKartu(X), ! ; nl, write('Kartu tidak valid! Warna atau jenisnya tidak cocok.'), nl) ;
             nl, write('Nomor kartu tidak valid atau tidak ada di tanganmu.'), nl)
     ;
         nl, write('Gagal! Perintah "uni(X)." HANYA bisa digunakan saat kartumu sisa 2.'), nl

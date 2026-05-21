@@ -24,7 +24,8 @@ pindahGiliran :-
     next_player(PemainSekarang, ListPemain, PemainBerikutnya),
     retract(giliran_sekarang(PemainSekarang)),
     asserta(giliran_sekarang(PemainBerikutnya)),
-    nl, write('Giliran '), write(PemainBerikutnya), write('.'), nl.
+    nl, write('Giliran '), write(PemainBerikutnya), write('.'), nl,
+    !.
 
 next_player(X, [X|Tail], Next) :-
     (Tail = [Next|_] -> true ; urutan_pemain([Next|_])).
