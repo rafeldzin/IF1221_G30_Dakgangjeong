@@ -1,6 +1,7 @@
 :- include('inisiasi.pl').
 :- include('ambil.pl').
 :- include('command.pl').
+:- include('file_io.pl').
 
 % MAIN
 startGame:-
@@ -19,4 +20,3 @@ startGame:-
     asserta(warna_aktif(WarnaAwal)),
     cekInfo,
     asserta(arah_permainan(kanan)).
-    

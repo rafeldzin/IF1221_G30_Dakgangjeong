@@ -1,0 +1,11 @@
+urutan_pemain(['Chu','Tipcu','Tvc']).
+giliran_sekarang('Chu').
+arah_permainan(kanan).
+discard_pile(kartu(merah,7)).
+kartu_pemain('Tvc',[kartu(biru,9),kartu(merah,8),kartu(hitam,wildd4),kartu(hijau,4),kartu(merah,6),kartu(merah,0)]).
+kartu_pemain('Chu',[kartu(biru,skip),kartu(kuning,1),kartu(hijau,5),kartu(biru,8),kartu(hijau,drawtwo),kartu(biru,reverse)]).
+kartu_pemain('Tipcu',[kartu(merah,9),kartu(hijau,skip),kartu(kuning,8),kartu(hijau,7),kartu(biru,6),kartu(merah,0),kartu(merah,4)]).
+warna_aktif(merah).
+pemain_sebelumnya('Tvc').
+warna_sebelumnya(merah).
+jenis_sebelumnya(skip).
