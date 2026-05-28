@@ -1,12 +1,12 @@
 :- include('deck.pl').
 
-%Buat minta jumlah pemain
+% Buat minta jumlah pemain
 inputJumlahPemain(X):-
     write('Masukkan jumlah pemain: '),
     read(Input),
     validasiJumlahPemain(X, Input).
 
-%Validasi agar jumlah pemainnya sesuai aturan (2 ampe 4)
+% Validasi agar jumlah pemainnya sesuai aturan (2 ampe 4)
 validasiJumlahPemain(X, Input):-
     integer(Input),
     Input >= 2,
@@ -14,11 +14,9 @@ validasiJumlahPemain(X, Input):-
     !,
     X = Input.
 
-
 validasiJumlahPemain(X, _Input):-
     write('Mohon masukkan angka antara 2 - 4.'), nl,
     inputJumlahPemain(X).
-
 
 % Buat mastiin nama yang diinput berbeda
 cekPemainUnik(Pemain, 1, [DaftarH]):-
@@ -30,8 +28,6 @@ cekPemainUnik(Pemain, X, [DaftarH|DaftarT]):-
     X1 is X - 1,
     cekPemainUnik(Pemain, X1, DaftarT).
 
-
-
 cekHurufBesar(Input) :-
     \+ var(Input),
     atom(Input),
@@ -39,10 +35,10 @@ cekHurufBesar(Input) :-
     HurufPertama >= 65,
     HurufPertama =< 90.
 
-% Buat nanya nama pemain
+% Buat nanya nama pemain (dengan instruksi spesifik)
 tanyaPemain(1, [Pemain1]):-
     repeat,
-        write('Masukkan nama pemain 1: '),
+        write('Masukkan nama pemain 1 (Wajib diawali huruf kapital & gunakan kutip tunggal, cth: \'Adinda\'): '),
         read(Input),
         ( cekHurufBesar(Input) ->
                 Pemain1 = Input, !
@@ -57,9 +53,8 @@ tanyaPemain(X, [PemainH|PemainT]):-
     tanyaPemain(X1, PemainT),
 
     repeat,
-        write('Masukkan nama pemain '), write(X), write(': '),
+        write('Masukkan nama pemain '), write(X), write(' (Wajib diawali huruf kapital & gunakan kutip tunggal, cth: \'Adinda\'): '),
         read(Input),
-        
         
         (   \+ cekHurufBesar(Input) ->
             write('Nama harus diawali huruf besar dan diapit tanda kutip tunggal.'), nl,

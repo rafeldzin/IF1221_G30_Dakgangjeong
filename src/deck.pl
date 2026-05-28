@@ -7,11 +7,23 @@ deck_kartu([
     kartu(biru, skip), kartu(biru, reverse), kartu(biru, drawtwo),
     kartu(hijau, skip), kartu(hijau, reverse), kartu(hijau, drawtwo),
     kartu(kuning, skip), kartu(kuning, reverse), kartu(kuning, drawtwo),
-    kartu(hitam, wild), kartu(hitam, wildd4)
+    kartu(hitam, wild), kartu(hitam, wildd4),
+    
+    % --- KARTU BONUS MIMIC ---
+    kartu(hitam, mimic), kartu(hitam, mimic), kartu(hitam, mimic), kartu(hitam, mimic)
 ]).
 
+inisiasi_deck :-
+    deck_kartu(DeckStatik),
+    acakGiliran(DeckStatik, DeckAcak),
+    retractall(deck_utama(_)),
+    asserta(deck_utama(DeckAcak)).
+
 pullKartu(Kartu) :-
-    deck_kartu(Deck),
-    length(Deck, Len),
-    random(0, Len, Idx),
-    nth0(Idx, Deck, Kartu).
+    deck_utama([Kartu | SisaDeck]),
+    retract(deck_utama(_)),
+    asserta(deck_utama(SisaDeck)).
+
+daurUlangDeck :-
+    inisiasi_deck,
+    nl, write('--- Deck utama habis! Tumpukan kartu telah dikocok ulang! ---'), nl.

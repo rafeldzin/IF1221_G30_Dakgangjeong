@@ -10,5 +10,13 @@
 :- dynamic(status_uni/1).
 :- dynamic(jenis_sebelumnya/1).
 :- dynamic(status_plus4/1).
+
+% --- FAKTA DINAMIS BONUS ---
+:- dynamic(kartu_aksi_terakhir/1).
+:- dynamic(kartu_tersembunyi/2).
+:- dynamic(game_mode/1).
+:- dynamic(tim_sukses/2).
+:- dynamic(status_swap/1).
+
 jumlah_card_awal(7).
 batasPemain(2,4).
