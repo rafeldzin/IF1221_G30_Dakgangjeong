@@ -56,7 +56,8 @@ tantang :-
         ( cek_punya_kecocokan(WarnaLama, JenisLama, ListKartuPembuang) ->
             write('Tantangan berhasil. '), write(Pembuang), write(' mendapatkan 4 kartu acak.'), nl,
             retractall(status_plus4(_)),
-            ambil_n_kartu(Pembuang, 4)
+            ambil_n_kartu(Pembuang, 4),
+            pindahGiliran
         ;
             write('Tantangan gagal. '), write(Penantang), write(' mendapatkan 6 kartu acak.'), nl,
             retractall(status_plus4(_)),

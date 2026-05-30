@@ -9,15 +9,15 @@ lihatCommand :-
     write('3. uni(slot). -> melantangkan "uni" jika kartu bersisa 1'), nl,
     write('4. tangkap(player). -> menuduh player tidak mengatakan uni'), nl,
     write('5. tantang. -> menghindari kartu draw'), nl,
-    ( game_mode(turnamen) -> write('6. swapKartu(slot, slotTeman). -> menukar kartu dengan teman satu tim'), nl ; true ),
-    write('7. sembunyikanKartu(slot). -> menyembunyikan kartu dari cekInfo (Bonus 3)'), nl,
-    write('8. tampilkanKartu. -> mengembalikan kartu tersembunyi ke tangan (Bonus 3)'), nl,
-    write('9. godsHand. -> memicu intervensi peluang acak (Bonus 1)'), nl,
+    write('6. sembunyikanKartu(slot). -> menyembunyikan kartu dari cekInfo (Bonus 3)'), nl,
+    write('7. tampilkanKartu. -> mengembalikan kartu tersembunyi ke tangan (Bonus 3)'), nl,
+    write('8. godsHand. -> memicu intervensi peluang acak (Bonus 1)'), nl,
+    ( game_mode(turnamen) -> write('9. swapKartu(slot, slotTeman). -> menukar kartu dengan teman satu tim'), nl ; true ),
     nl,
     write('Aksi pendukung yang tersedia:'), nl,
-    write('1. lihatCommand.'), nl,
-    write('2. lihatKartu.'), nl,
-    write('3. cekInfo.'), nl,
+    write('1. lihatCommand. -> semua command yang berlaku'), nl,
+    write('2. lihatKartu. -> melihat kartu tangan'), nl,
+    write('3. cekInfo. -> melihat kondisi meja permainan sekarang'), nl,
     write('4. saveGame. -> menyimpan status permainan ke dalam file'), nl,
     write('5. loadGame. -> memuat status permainan dari file'), nl,
     nl.
@@ -28,7 +28,7 @@ lihatKartu :-
     kartu_tersembunyi(Pemain, HiddenList),
     nl, write('Berikut kartu yang anda miliki.'), nl,
     print_daftar_kartu_all(ListKartu, 1, NextNo),
-    print_daftar_kartu_hidden(HiddenList, NextNo),
+    print_daftar_kartu_hidden(HiddenList, NextNo, _),
     
     % --- BONUS 4: MODE TURNAMEN (LIHAT KARTU TEMAN TIM) ---
     ( game_mode(turnamen) ->
@@ -45,8 +45,8 @@ lihatKartu :-
     nl, write('Permainan belum dimulai! Silakan ketik startGame. terlebih dahulu.'), nl.
 
 print_daftar_kartu_all([], Nomor, Nomor).
-print_daftar_kartu_all([kartu(hitam, Jenis) | SisaKartu], Nomor, NextNo) :-
-    write(Nomor), write('. hitam-'), write(Jenis), write(' (disembunyikan)'), nl,
+print_daftar_kartu_all([kartu(Warna, Jenis) | SisaKartu], Nomor, NextNo) :-
+    write(Nomor), write('. '),write(Warna), write('-'), write(Jenis), nl,
     NomorSelanjutnya is Nomor + 1,
     print_daftar_kartu_all(SisaKartu, NomorSelanjutnya, NextNo).
 print_daftar_kartu_all([kartu(Warna, Jenis) | SisaKartu], Nomor, NextNo) :-
@@ -355,3 +355,6 @@ abisinKartu(Pemain):-
 sisainDuaKartu(Pemain) :-
     retractall(kartu_pemain(Pemain, _)), asserta(kartu_pemain(Pemain, [kartu(hitam, wild), kartu(hitam, wildd4)])),
     nl, write('Kartu '), write(Pemain), write(' disisakan 2 kartu!'), nl.
+
+help:-
+    lihatCommand.

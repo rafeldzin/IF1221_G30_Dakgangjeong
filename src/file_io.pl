@@ -45,7 +45,9 @@ loadGame :-
             close(Stream),
             nl, write('Game berhasil dimuat dari file: '), write(Filename), nl,
             nl, write('--- STATUS GAME SAAT INI ---'), nl,
-            cekInfo
+            cekInfo, nl,
+            giliran_sekarang(Giliran),
+            write('Melanjutkan giliran '), write(Giliran), write('.'), nl
         ), _, ( nl, write('ERROR: File '), write(Filename), write(' tidak ditemukan!'), nl ))
     ;   nl, write('Format nama file salah! Harus diapit kutip tunggal.'), nl ).
 
