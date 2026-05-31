@@ -17,9 +17,9 @@ Permainan ini tidak hanya memiliki fitur dan aturan seperti pencocokan warna dan
 ## Cara Menjalankan Program
 
 Untuk menjalankan program ini, pastikan Anda telah menginstal GNU Prolog.
-1. Buka terminal atau command prompt.
-2. Arahkan direktori (masuk) ke dalam folder src dari proyek ini dengan mengetik cd path/to/IF1221_G30_Dakgangjeong/src
-3. Buka interaktif GNU Prolog dengan mengetikkan gprolog.
+1. Buka terminal atau command prompt di folder ini.
+2. Arahkan direktori ke dalam folder src dengan mengetik cd src
+3. Buka GNU Prolog dengan mengetikkan gprolog.
 4. Ketik ['main'].
 5. Mulai permainan dengan mengetik startGame.
 
