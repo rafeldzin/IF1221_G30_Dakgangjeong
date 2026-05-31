@@ -37,7 +37,14 @@ pindahGiliran :-
     !.
 
 next_player(X, [X|Tail], Next) :-
-    (Tail = [Next|_] -> true ; urutan_pemain([Next|_])).
+    ( Tail = [Next|_] -> true
+    ; urutan_pemain(Asli),
+      ( arah_permainan(kiri) ->
+          reverse_list(Asli, [Next|_])
+      ;
+          Asli = [Next|_]
+      )
+    ).
 next_player(X, [_|Tail], Next) :-
     next_player(X, Tail, Next).
 

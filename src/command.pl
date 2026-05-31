@@ -138,7 +138,6 @@ hapus_kartu_index(1, [_|Tail], Tail) :- !.
 hapus_kartu_index(N, [Head|Tail], [Head|TailSisa]) :-
     N > 1, N1 is N - 1, hapus_kartu_index(N1, Tail, TailSisa).
 
-% EFECTS INTERPRETATION
 terapkan_efek(kartu(_, Jenis)) :- integer(Jenis), pindahGiliran.
 terapkan_efek(kartu(_, skip)) :- nl, write('Pemain selanjutnya terkena Skip!'), nl, pindahGiliran, pindahGiliran.
 terapkan_efek(kartu(_, drawtwo)) :-
@@ -150,7 +149,11 @@ terapkan_efek(kartu(hitam, wildd4)) :-
     nl, write('PERINGATAN: Pemain selanjutnya diancam +4! (Ketik "tantang." atau "ambilKartu.")'), nl,
     retractall(status_plus4(_)), asserta(status_plus4(aktif)),
     pindahGiliran.
-terapkan_efek(kartu(_, reverse)) :- nl, write('Arah permainan diputar balik!'), nl, ubahArah, pindahGiliran.
+terapkan_efek(kartu(_, reverse)) :-
+    nl, write('Arah permainan diputar balik!'), nl,
+    ubahArah,
+    urutan_pemain(LP), get_length(LP, Len),
+    (Len =:= 2 -> pindahGiliran, pindahGiliran ; pindahGiliran).
 terapkan_efek(kartu(hitam, mimic)) :-
     kartu_aksi_terakhir(KartuAksi),
     ( KartuAksi == none ->
@@ -161,8 +164,7 @@ terapkan_efek(kartu(hitam, mimic)) :-
         nl, write('Menelusuri riwayat permainan.'), nl,
         write('Kartu aksi terakhir yang dimainkan: '), write(WarnaAksi), write('-'), write(JenisAksi), nl,
         write('Kartu mimic menyalin efek '), write(JenisAksi), write('!'), nl,
-        
-        pilihWarnaBaru, 
+        pilihWarnaBaru,
         ( JenisAksi == skip -> pindahGiliran, pindahGiliran
         ; JenisAksi == reverse -> ubahArah, pindahGiliran
         ; JenisAksi == drawtwo -> pindahGiliran, giliran_sekarang(Korban), ambil_n_kartu(Korban, 2), pindahGiliran
