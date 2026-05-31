@@ -20,6 +20,9 @@ lihatCommand :-
     write('3. cekInfo. -> melihat kondisi meja permainan sekarang'), nl,
     write('4. saveGame. -> menyimpan status permainan ke dalam file'), nl,
     write('5. loadGame. -> memuat status permainan dari file'), nl,
+    write('1. lihatCommand.'), nl,
+    write('2. lihatKartu.'), nl,
+    write('3. cekInfo.'), nl,
     nl.
 
 lihatKartu :-

@@ -2,7 +2,6 @@
 :- include('inisiasi.pl').
 :- include('ambil.pl').
 :- include('command.pl').
-:- include('file_io.pl').
 
 startGame :-
     retractall(game_mode(_)),
@@ -38,6 +37,10 @@ startGame :-
     retractall(giliran_sekarang(_)),
     asserta(giliran_sekarang(PemainPertama)),
     
+<<<<<<< HEAD
+=======
+    % INISIALISASI STATE & DECK DINAMIS
+>>>>>>> 0c01fc1554bd83337672fa91e16cb792957f8bfa
     inisiasi_deck,
     retractall(arah_permainan(_)), asserta(arah_permainan(kanan)),
     retractall(status_plus4(_)), asserta(status_plus4(nonaktif)),
@@ -57,6 +60,7 @@ startGame :-
     
     retractall(discard_pile(_)),
     asserta(discard_pile(KartuAwal)),
+
     retractall(warna_aktif(_)),
     asserta(warna_aktif(WarnaFix)),
     
