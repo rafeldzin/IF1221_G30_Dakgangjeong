@@ -34,6 +34,7 @@ Folder src berisi beberapa file source code, yaitu:
 6. endgame.pl: file yang menghitung poin akhir yang aktif ketika state kartu pemain kosong untuk menghasilkan leaderboard dan penentuan pemenang.
 7. facts.pl: Berisi variabel dinamis yang menampung seluruh state permainan (daftar giliran, tumpukan buangan, warna aktif, dll).
 8. file_io.pl: file untuk melakukan save dan load seluruh state dinamis dari/ke dalam file .txt.
+9. helper.pl: berisi fungsi fungsi helper yang dideklarasi manual untuk memenuhi batasan praktikum.
 
 Folder doc berisi beberapa file dokumen, yaitu:
 1. Milestone1_G30.pdf: berisi dokumentasi progress kelompok pada milestone pertama.
