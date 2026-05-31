@@ -8,8 +8,6 @@ deck_kartu([
     kartu(hijau, skip), kartu(hijau, reverse), kartu(hijau, drawtwo),
     kartu(kuning, skip), kartu(kuning, reverse), kartu(kuning, drawtwo),
     kartu(hitam, wild), kartu(hitam, wildd4),
-    
-    % --- KARTU BONUS MIMIC ---
     kartu(hitam, mimic), kartu(hitam, mimic), kartu(hitam, mimic), kartu(hitam, mimic)
 ]).
 

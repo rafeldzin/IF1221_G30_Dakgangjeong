@@ -33,7 +33,7 @@ lihatKartu :-
     print_daftar_kartu_all(ListKartu, 1, NextNo),
     print_daftar_kartu_hidden(HiddenList, NextNo, _),
     
-    % --- BONUS 4: MODE TURNAMEN (LIHAT KARTU TEMAN TIM) ---
+    % MODE TURNAMEN
     ( game_mode(turnamen) ->
         cari_teman_tim(Pemain, Teman),
         kartu_pemain(Teman, ListKartuTeman),
@@ -161,11 +161,13 @@ terapkan_efek(kartu(hitam, mimic)) :-
         nl, write('Menelusuri riwayat permainan.'), nl,
         write('Kartu aksi terakhir yang dimainkan: '), write(WarnaAksi), write('-'), write(JenisAksi), nl,
         write('Kartu mimic menyalin efek '), write(JenisAksi), write('!'), nl,
+        
+        pilihWarnaBaru, 
         ( JenisAksi == skip -> pindahGiliran, pindahGiliran
         ; JenisAksi == reverse -> ubahArah, pindahGiliran
         ; JenisAksi == drawtwo -> pindahGiliran, giliran_sekarang(Korban), ambil_n_kartu(Korban, 2), pindahGiliran
-        ; JenisAksi == wild -> pilihWarnaBaru, pindahGiliran
-        ; JenisAksi == wildd4 -> pilihWarnaBaru, nl, write('PERINGATAN: Pemain selanjutnya diancam +4!'), nl, retractall(status_plus4(_)), asserta(status_plus4(aktif)), pindahGiliran
+        ; JenisAksi == wild -> pindahGiliran
+        ; JenisAksi == wildd4 -> nl, write('PERINGATAN: Pemain selanjutnya diancam +4!'), nl, retractall(status_plus4(_)), asserta(status_plus4(aktif)), pindahGiliran
         )
     ).
 
@@ -218,13 +220,13 @@ tangkap(Target) :-
             ambil_n_kartu(Penuduh, 1), pindahGiliran )
     ).
 
-% BONUS 2: MIMIC ENGINE
+% MIMIC ENGINE
 catat_kartu_aksi(Kartu) :-
     Kartu = kartu(_, Jenis),
     ( my_member(Jenis, [skip, reverse, drawtwo, wild, wildd4]) ->
         retractall(kartu_aksi_terakhir(_)), asserta(kartu_aksi_terakhir(Kartu)) ; true ).
 
-% BONUS 1: GOD'S HAND INTERVENTION
+% GOD'S HAND 
 godsHand :-
     ( cek_semua_satu_kartu ->
         nl, write('Mekanisme batal. Semua pemain hanya memiliki satu kartu untuk menjaga keseimbangan.'), nl
@@ -267,7 +269,7 @@ hapus_elemen(_, [], []).
 hapus_elemen(X, [X|T], T) :- !.
 hapus_elemen(X, [H|T], [H|T2]) :- hapus_elemen(X, T, T2).
 
-% BONUS 3: HIDDEN CARD CORE MECHANICS
+% HIDDEN CARD
 sembunyikanKartu(X) :-
     giliran_sekarang(Pemain),
     kartu_pemain(Pemain, ListKartu),
@@ -304,7 +306,6 @@ tampilkanKartu :-
             nl, write('Semua kartu yang tersembunyi berhasil ditampilkan kembali ke tangan.'), nl )
     ).
 
-% BONUS 4: TOURNAMENT MODE SWAP LOGIC
 swapKartu(X, Y) :-
     ( \+ game_mode(turnamen) -> nl, write('Perintah ini hanya tersedia pada Mode Turnamen!'), nl
     ; status_swap(sudah) -> nl, write('Gagal! Anda hanya bisa menukar kartu sekali dalam satu giliran.'), nl

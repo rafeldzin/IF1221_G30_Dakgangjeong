@@ -11,7 +11,6 @@
 :- dynamic(jenis_sebelumnya/1).
 :- dynamic(status_plus4/1).
 
-% --- FAKTA DINAMIS BONUS ---
 :- dynamic(kartu_aksi_terakhir/1).
 :- dynamic(kartu_tersembunyi/2).
 :- dynamic(game_mode/1).

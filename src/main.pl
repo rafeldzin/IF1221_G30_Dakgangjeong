@@ -37,7 +37,6 @@ startGame :-
     retractall(giliran_sekarang(_)),
     asserta(giliran_sekarang(PemainPertama)),
     
-    % INISIALISASI STATE & DECK DINAMIS
     inisiasi_deck,
     retractall(arah_permainan(_)), asserta(arah_permainan(kanan)),
     retractall(status_plus4(_)), asserta(status_plus4(nonaktif)),
@@ -51,9 +50,12 @@ startGame :-
     bagi_kartu_semua(UrutanPemain),
     write('Kartu awal telah dibagikan kepada semua pemain!'), nl,
     
-    pullKartu(KartuAwal),
-    KartuAwal = kartu(WarnaAwal, _),
-    ( WarnaAwal == hitam -> WarnaFix = merah ; WarnaFix = WarnaAwal ),
+    %pullKartu(KartuAwal),
+    %KartuAwal = kartu(WarnaAwal, _),
+    %( WarnaAwal == hitam -> WarnaFix = merah ; WarnaFix = WarnaAwal ),
+
+    tarikAwalNonHitam(KartuAwal),
+    KartuAwal = kartu(WarnaFix, _),
     
     retractall(discard_pile(_)),
     asserta(discard_pile(KartuAwal)),
@@ -146,3 +148,16 @@ debugTurnamen :-
     sisainDuaKartu('D'),
     nl,
     cekInfo, !.
+
+tarikAwalNonHitam(KartuFix) :-
+    pullKartu(Kartu),
+    Kartu = kartu(Warna, _),
+    ( Warna == hitam ->
+        deck_utama(SisaDeck),
+        append_element(SisaDeck, Kartu, DeckBaru),
+        retractall(deck_utama(_)),
+        asserta(deck_utama(DeckBaru)),
+        tarikAwalNonHitam(KartuFix)
+    ;
+        KartuFix = Kartu
+    ).
