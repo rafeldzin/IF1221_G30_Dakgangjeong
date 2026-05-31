@@ -2,6 +2,7 @@
 :- include('inisiasi.pl').
 :- include('ambil.pl').
 :- include('command.pl').
+:- include('file_io.pl').
 
 startGame :-
     retractall(game_mode(_)),
