@@ -36,6 +36,7 @@ startGame :-
     UrutanPemain = [PemainPertama | _], 
     retractall(giliran_sekarang(_)),
     asserta(giliran_sekarang(PemainPertama)),
+    
     % INISIALISASI STATE & DECK DINAMIS
     inisiasi_deck,
     retractall(arah_permainan(_)), asserta(arah_permainan(kanan)),
