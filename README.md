@@ -1,12 +1,10 @@
 # IF1221_G30_Dakgangjeong (Tugas Besar)
 
 ## Anggota Kelompok
-Ketua : Ahmad Boutros Fathir (13525002)
-
-Anggota:
-1. Muhammad Zaky Amani (13525040)
-2. Mochammad Nuha Al Ghifari (13525056)
-3. Rafel Dzinun Muhammad (13525062)
+1. Ahmad Boutros Fathir (13525002)
+2. Muhammad Zaky Amani (13525040)
+3. Mochammad Nuha Al Ghifari (13525056)
+4. Rafel Dzinun Muhammad (13525062)
 
 ## Gambaran Singkat Proyek
 
