@@ -1,9 +1,9 @@
+:- include('helper.pl').
 :- include('inisiasi.pl').
 :- include('ambil.pl').
 :- include('command.pl').
 :- include('file_io.pl').
 
-% MAIN
 startGame :-
     retractall(game_mode(_)),
     retractall(tim_sukses(_, _)),
@@ -13,8 +13,7 @@ startGame :-
     repeat,
         nl, write('Pilih mode permainan: '),
         read(ModeInput),
-        ( member(ModeInput, [1, 2]) -> ! ; write('Pilihan tidak valid!'), nl, fail ),
-    
+        ( my_member(ModeInput, [1, 2]) -> ! ; write('Pilihan tidak valid!'), nl, fail ),
     ( ModeInput == 1 ->
         asserta(game_mode(klasik)),
         inputJumlahPemain(JumlahPemain),
@@ -30,10 +29,8 @@ startGame :-
         nl, write('Membentuk tim secara acak...'), nl, nl,
         write('Tim 1 : '), write(T1P1), write(', '), write(T1P2), nl,
         write('Tim 2 : '), write(T2P1), write(', '), write(T2P2), nl, nl,
-        % Urutan berselang-seling Tim 1 - Tim 2 - Tim 1 - Tim 2
         UrutanPemain = [T1P1, T2P1, T1P2, T2P2]
     ),
-    
     printUrutan(UrutanPemain),
     retractall(urutan_pemain(_)),
     asserta(urutan_pemain(UrutanPemain)),
@@ -41,7 +38,6 @@ startGame :-
     retractall(giliran_sekarang(_)),
     asserta(giliran_sekarang(PemainPertama)),
     
-    % --- INISIALISASI STATE & DECK DINAMIS ---
     inisiasi_deck,
     retractall(arah_permainan(_)), asserta(arah_permainan(kanan)),
     retractall(status_plus4(_)), asserta(status_plus4(nonaktif)),
@@ -51,7 +47,6 @@ startGame :-
     retractall(kartu_aksi_terakhir(_)), asserta(kartu_aksi_terakhir(none)),
     retractall(status_swap(_)), asserta(status_swap(belum)),
     inisiasi_kartu_tersembunyi(UrutanPemain),
-    % -----------------------------------------
     
     bagi_kartu_semua(UrutanPemain),
     write('Kartu awal telah dibagikan kepada semua pemain!'), nl,
@@ -108,7 +103,7 @@ debugKlasik :-
     sisainDuaKartu('A'),
     sisainDuaKartu('B'),
     nl,
-    cekInfo.
+    cekInfo, !.
 
 debugTurnamen :-
     retractall(game_mode(_)),
@@ -142,10 +137,11 @@ debugTurnamen :-
     asserta(kartu_aksi_terakhir(none)),
     asserta(status_swap(belum)),
     inisiasi_kartu_tersembunyi(['A', 'B', 'C', 'D']),
+    inisiasi_deck,
 
     sisainDuaKartu('A'),
     sisainDuaKartu('B'),
     sisainDuaKartu('C'),
     sisainDuaKartu('D'),
     nl,
-    cekInfo.
+    cekInfo, !.

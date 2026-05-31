@@ -46,11 +46,6 @@ lihatKartu :-
 
 print_daftar_kartu_all([], Nomor, Nomor).
 print_daftar_kartu_all([kartu(Warna, Jenis) | SisaKartu], Nomor, NextNo) :-
-    write(Nomor), write('. '),write(Warna), write('-'), write(Jenis), nl,
-    NomorSelanjutnya is Nomor + 1,
-    print_daftar_kartu_all(SisaKartu, NomorSelanjutnya, NextNo).
-print_daftar_kartu_all([kartu(Warna, Jenis) | SisaKartu], Nomor, NextNo) :-
-    Warna \= hitam,
     write(Nomor), write('. '), write(Warna), write('-'), write(Jenis), nl,
     NomorSelanjutnya is Nomor + 1,
     print_daftar_kartu_all(SisaKartu, NomorSelanjutnya, NextNo).
@@ -84,7 +79,7 @@ printUrutanInfo([PemainH | PemainT]) :- write(PemainH), write(' - '), printUruta
 printPemainInfo([], _).
 printPemainInfo([PemainH | PemainT], Nomor) :-
     kartu_pemain(PemainH, ListKartu),
-    length(ListKartu, JumlahKartu),
+    get_length(ListKartu, JumlahKartu),
     write('Nama pemain '), write(Nomor), write(': '), write(PemainH), nl,
     write('Jumlah kartu : '), write(JumlahKartu), nl, nl,
     NomorSelanjutnya is Nomor + 1,
@@ -96,7 +91,7 @@ mainkanKartu(X) :-
     ;
         giliran_sekarang(Pemain),
         kartu_pemain(Pemain, ListKartu),
-        ( nth1(X, ListKartu, KartuPilihan) ->
+        ( get_element_1based(ListKartu, X, KartuPilihan) ->
             ( validasi_kartu(KartuPilihan) ->
                 KartuPilihan = kartu(Warna, Jenis),
                 hapus_kartu_index(X, ListKartu, SisaKartu),
@@ -175,7 +170,7 @@ pilihWarnaBaru :-
     repeat,
         nl, write('Silahkan memilih warna baru (merah/kuning/hijau/biru): '),
         read(WarnaBaru),
-        ( member(WarnaBaru, [merah, kuning, hijau, biru]) ->
+        ( my_member(WarnaBaru, [merah, kuning, hijau, biru]) ->
             retractall(warna_aktif(_)), asserta(warna_aktif(WarnaBaru)), nl, !
         ; write('Warna tidak valid! Pastikan menggunakan huruf kecil.'), nl, fail ).
 
@@ -185,13 +180,13 @@ ubahArah :- arah_permainan(kiri), retractall(arah_permainan(_)), asserta(arah_pe
 uni(X) :-
     giliran_sekarang(Pemain),
     kartu_pemain(Pemain, ListKartu),
-    length(ListKartu, Jumlah),
+    get_length(ListKartu, Jumlah), 
     ( Jumlah =:= 2 ->
-        ( nth1(X, ListKartu, KartuPilihan) ->
+        ( get_element_1based(ListKartu, X, KartuPilihan) -> 
             ( validasi_kartu(KartuPilihan) ->
                 asserta(status_uni(Pemain)),
                 nl, write(Pemain), write(' UNI!!!'), nl,
-                mainkanKartu(X), ! 
+                mainkanKartu(X), !
             ; ( KartuPilihan = kartu(hitam, wildd4), discard_pile(kartu(hitam, wildd4)) -> true 
               ; nl, write('Kartu tidak valid! Warna atau jenisnya tidak cocok.'), nl ) ) 
         ; nl, write('Nomor kartu tidak valid atau tidak ada di tanganmu.'), nl )
@@ -206,7 +201,7 @@ tangkap(Target) :-
         ambil_n_kartu(Penuduh, 1), pindahGiliran
     ;
         kartu_pemain(Target, ListKartu),
-        length(ListKartu, Jumlah),
+        get_length(ListKartu, Jumlah),
         (Jumlah =:= 1 ->
             ( \+ status_uni(Target) ->
                 nl, write('Tangkap BERHASIL! '), write(Target), write(' lupa bilang UNI.'), nl,
@@ -223,7 +218,7 @@ tangkap(Target) :-
 % BONUS 2: MIMIC ENGINE
 catat_kartu_aksi(Kartu) :-
     Kartu = kartu(_, Jenis),
-    ( member(Jenis, [skip, reverse, drawtwo, wild, wildd4]) ->
+    ( my_member(Jenis, [skip, reverse, drawtwo, wild, wildd4]) ->
         retractall(kartu_aksi_terakhir(_)), asserta(kartu_aksi_terakhir(Kartu)) ; true ).
 
 % BONUS 1: GOD'S HAND INTERVENTION
@@ -238,20 +233,20 @@ godsHand :-
 
 cek_semua_satu_kartu :- urutan_pemain(List), cek_satu_kartu_loop(List).
 cek_satu_kartu_loop([]).
-cek_satu_kartu_loop([P|T]) :- kartu_pemain(P, K), length(K, 1), cek_satu_kartu_loop(T).
+cek_satu_kartu_loop([P|T]) :- kartu_pemain(P, K), get_length(K, 1), cek_satu_kartu_loop(T).
 
 eksekusi_gods_hand :-
     urutan_pemain(ListPemain),
     ambil_pemain_random_ada_kartu(ListPemain, PemainAsal),
     kartu_pemain(PemainAsal, KartuAsal),
-    length(KartuAsal, Len), random(0, Len, Idx),
+    get_length(KartuAsal, Len), random(0, Len, Idx), 
     ambil_dan_hapus_nth0(Idx, KartuAsal, KartuPindahan, SisaKartuAsal),
     hapus_elemen(PemainAsal, ListPemain, CalonTujuan),
-    length(CalonTujuan, LenTujuan), random(0, LenTujuan, IdxTujuan),
+    get_length(CalonTujuan, LenTujuan), random(0, LenTujuan, IdxTujuan), 
     ambil_dan_hapus_nth0(IdxTujuan, CalonTujuan, PemainTujuan, _),
     
     retract(kartu_pemain(PemainAsal, KartuAsal)), asserta(kartu_pemain(PemainAsal, SisaKartuAsal)),
-    kartu_pemain(PemainTujuan, KartuTujuanLama), append(KartuTujuanLama, [KartuPindahan], KartuTujuanBaru),
+    kartu_pemain(PemainTujuan, KartuTujuanLama), append_element(KartuTujuanLama, KartuPindahan, KartuTujuanBaru),
     retract(kartu_pemain(PemainTujuan, KartuTujuanLama)), asserta(kartu_pemain(PemainTujuan, KartuTujuanBaru)),
     
     nl, write('Tuhan telah berkehendak.'), nl,
@@ -260,8 +255,8 @@ eksekusi_gods_hand :-
     cekEndGame, pindahGiliran.
 
 ambil_pemain_random_ada_kartu(List, Pemain) :-
-    length(List, Len), random(0, Len, Idx), ambil_dan_hapus_nth0(Idx, List, P, _),
-    kartu_pemain(P, K), length(K, L), ( L > 0 -> Pemain = P ; ambil_pemain_random_ada_kartu(List, Pemain) ).
+    get_length(List, Len), random(0, Len, Idx), ambil_dan_hapus_nth0(Idx, List, P, _), 
+    kartu_pemain(P, K), get_length(K, L), ( L > 0 -> Pemain = P ; ambil_pemain_random_ada_kartu(List, Pemain) ).
 
 ambil_dan_hapus_nth0(0, [H|T], H, T) :- !.
 ambil_dan_hapus_nth0(N, [H|T], Elem, [H|Sisa]) :- N > 0, N1 is N - 1, ambil_dan_hapus_nth0(N1, T, Elem, Sisa).
@@ -274,16 +269,16 @@ sembunyikanKartu(X) :-
     giliran_sekarang(Pemain),
     kartu_pemain(Pemain, ListKartu),
     kartu_tersembunyi(Pemain, HiddenList),
-    length(ListKartu, TotalVisible),
-    length(HiddenList, TotalHidden),
+    get_length(ListKartu, TotalVisible), 
+    get_length(HiddenList, TotalHidden),
     TotalTotal is TotalVisible + TotalHidden,
     ( TotalTotal =< 1 ->
         nl, write('Gagal! Perintah ini tidak berlaku jika pemain hanya memiliki satu buah kartu.'), nl
     ;
-        ( nth1(X, ListKartu, KartuPilihan) ->
+        ( get_element_1based(ListKartu, X, KartuPilihan) -> 
             hapus_kartu_index(X, ListKartu, SisaKartu),
             retract(kartu_pemain(Pemain, ListKartu)), asserta(kartu_pemain(Pemain, SisaKartu)),
-            append(HiddenList, [KartuPilihan], NewHiddenList),
+            append_element(HiddenList, KartuPilihan, NewHiddenList), 
             retractall(kartu_tersembunyi(Pemain, _)), asserta(kartu_tersembunyi(Pemain, NewHiddenList)),
             KartuPilihan = kartu(W, J),
             nl, write('Kartu '), write(W), write('-'), write(J), write(' berhasil disembunyikan.'), nl
@@ -296,11 +291,11 @@ tampilkanKartu :-
     kartu_tersembunyi(Pemain, HiddenList),
     ( HiddenList == [] -> nl, write('Tidak ada kartu yang sedang disembunyikan.'), nl
     ;
-        length(ListKartu, TotalVisible),
-        length(HiddenList, TotalHidden),
+        get_length(ListKartu, TotalVisible),
+        get_length(HiddenList, TotalHidden),
         TotalTotal is TotalVisible + TotalHidden,
         ( TotalTotal =< 1 -> nl, write('Gagal! Perintah ini tidak berlaku jika pemain hanya memiliki satu buah kartu.'), nl
-        ;   append(ListKartu, HiddenList, NewListKartu),
+        ;   append_list(ListKartu, HiddenList, NewListKartu),
             retract(kartu_pemain(Pemain, ListKartu)), asserta(kartu_pemain(Pemain, NewListKartu)),
             retractall(kartu_tersembunyi(Pemain, _)), asserta(kartu_tersembunyi(Pemain, [])),
             nl, write('Semua kartu yang tersembunyi berhasil ditampilkan kembali ke tangan.'), nl )
@@ -315,17 +310,17 @@ swapKartu(X, Y) :-
         cari_teman_tim(Pemain, Teman),
         kartu_pemain(Pemain, ListKartu),
         kartu_pemain(Teman, ListKartuTeman),
-        length(ListKartu, LenP), length(ListKartuTeman, LenT),
+        get_length(ListKartu, LenP), get_length(ListKartuTeman, LenT),
         ( (LenP =< 1 ; LenT =< 1) ->
             nl, write('Gagal! Pertukaran tidak dapat dilakukan jika salah satu pemain hanya memiliki satu kartu.'), nl
         ;
-            ( nth1(X, ListKartu, KartuP), nth1(Y, ListKartuTeman, KartuT) ->
+            ( get_element_1based(ListKartu, X, KartuP), get_element_1based(ListKartuTeman, Y, KartuT) ->
                 hapus_kartu_index(X, ListKartu, SisaP),
-                append(SisaP, [KartuT], BaruP),
+                append_element(SisaP, KartuT, BaruP),
                 retract(kartu_pemain(Pemain, ListKartu)), asserta(kartu_pemain(Pemain, BaruP)),
                 
                 hapus_kartu_index(Y, ListKartuTeman, SisaT),
-                append(SisaT, [KartuP], BaruT),
+                append_element(SisaT, KartuP, BaruT),
                 retract(kartu_pemain(Teman, ListKartuTeman)), asserta(kartu_pemain(Teman, BaruT)),
                 
                 retractall(status_swap(_)), asserta(status_swap(sudah)),
@@ -345,7 +340,7 @@ cari_teman_tim(Pemain, Teman) :-
 
 tambahKartu(Pemain, Warna, Jenis) :-
     kartu_pemain(Pemain, ListKartu),
-    append(ListKartu, [kartu(Warna, Jenis)], ListBaru),
+    append_element(ListKartu, kartu(Warna, Jenis), ListBaru), 
     retract(kartu_pemain(Pemain, ListKartu)), asserta(kartu_pemain(Pemain, ListBaru)).
 
 abisinKartu(Pemain):-

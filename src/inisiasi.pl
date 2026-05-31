@@ -1,5 +1,6 @@
 :- include('deck.pl').
 
+
 % Buat minta jumlah pemain
 inputJumlahPemain(X):-
     write('Masukkan jumlah pemain: '),
@@ -17,6 +18,7 @@ validasiJumlahPemain(X, Input):-
 validasiJumlahPemain(X, _Input):-
     write('Mohon masukkan angka antara 2 - 4.'), nl,
     inputJumlahPemain(X).
+
 
 % Buat mastiin nama yang diinput berbeda
 cekPemainUnik(Pemain, 1, [DaftarH]):-
@@ -55,15 +57,14 @@ tanyaPemain(X, [PemainH|PemainT]):-
     repeat,
         write('Masukkan nama pemain '), write(X), write(' (Wajib diawali huruf kapital & gunakan kutip tunggal, cth: \'Adinda\'): '),
         read(Input),
-        
         (   \+ cekHurufBesar(Input) ->
             write('Nama harus diawali huruf besar dan diapit tanda kutip tunggal.'), nl,
             fail
-            
-        ;   cekPemainUnik(Input, X1, PemainT) ->
+        ;   
+            cekPemainUnik(Input, X1, PemainT) ->
             PemainH = Input, !
-
-        ;   \+ cekPemainUnik(Input, X1, PemainT) ->
+        ;   
+            \+ cekPemainUnik(Input, X1, PemainT) ->
             write('Nama sudah digunakan. Masukkan nama lain!'), nl,
             fail;
             PemainH = Input, !
@@ -83,7 +84,7 @@ buangNo([_-Pemain|SisaRandom], [Pemain|SisaPemain]):-
 % mengacak urutan pemain
 acakGiliran(UrutanAwal, UrutanAcak):-
     noRandom(UrutanAwal, UrutanDenganNo),
-    keysort(UrutanDenganNo, UrutanAcakDenganNo),
+    my_keysort(UrutanDenganNo, UrutanAcakDenganNo),
     buangNo(UrutanAcakDenganNo, UrutanAcak).
 
 % ngeprint per pemainnya

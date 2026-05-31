@@ -12,7 +12,7 @@ ambilKartu :-
 
 prosesAmbil(Pemain, Kartu) :-
     kartu_pemain(Pemain, KartuLama),
-    append(KartuLama, [Kartu], KartuBaru),
+    append_element(KartuLama, Kartu, KartuBaru),
     retract(kartu_pemain(Pemain, KartuLama)),
     asserta(kartu_pemain(Pemain, KartuBaru)),
     retractall(status_uni(Pemain)),
@@ -24,9 +24,8 @@ pindahGiliran :-
     giliran_sekarang(PemainSekarang),
     urutan_pemain(ListPemain),
     
-    % --- LOGIKA PEMBACAAN ARAH PERMAINAN ---
     ( arah_permainan(kiri) ->
-        reverse(ListPemain, ListReversed),
+        reverse_list(ListPemain, ListReversed),
         next_player(PemainSekarang, ListReversed, PemainBerikutnya)
     ;
         next_player(PemainSekarang, ListPemain, PemainBerikutnya)
@@ -74,7 +73,7 @@ ambil_n_kartu(Pemain, N) :-
     ( deck_utama([]) -> daurUlangDeck ; true ),
     pullKartu(Kartu),
     kartu_pemain(Pemain, KartuLama),
-    append(KartuLama, [Kartu], KartuBaru),
+    append_element(KartuLama, Kartu, KartuBaru),
     retract(kartu_pemain(Pemain, KartuLama)),
     asserta(kartu_pemain(Pemain, KartuBaru)),
     retractall(status_uni(Pemain)),
