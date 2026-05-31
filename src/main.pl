@@ -1,7 +1,6 @@
 :- include('inisiasi.pl').
 :- include('ambil.pl').
 :- include('command.pl').
-:- include('file_io.pl').
 
 % MAIN
 startGame :-
@@ -41,7 +40,7 @@ startGame :-
     retractall(giliran_sekarang(_)),
     asserta(giliran_sekarang(PemainPertama)),
     
-    % --- INISIALISASI STATE & DECK DINAMIS ---
+    % INISIALISASI STATE & DECK DINAMIS
     inisiasi_deck,
     retractall(arah_permainan(_)), asserta(arah_permainan(kanan)),
     retractall(status_plus4(_)), asserta(status_plus4(nonaktif)),
@@ -51,7 +50,6 @@ startGame :-
     retractall(kartu_aksi_terakhir(_)), asserta(kartu_aksi_terakhir(none)),
     retractall(status_swap(_)), asserta(status_swap(belum)),
     inisiasi_kartu_tersembunyi(UrutanPemain),
-    % -----------------------------------------
     
     bagi_kartu_semua(UrutanPemain),
     write('Kartu awal telah dibagikan kepada semua pemain!'), nl,
@@ -62,6 +60,7 @@ startGame :-
     
     retractall(discard_pile(_)),
     asserta(discard_pile(KartuAwal)),
+
     retractall(warna_aktif(_)),
     asserta(warna_aktif(WarnaFix)),
     
@@ -149,3 +148,6 @@ debugTurnamen :-
     sisainDuaKartu('D'),
     nl,
     cekInfo.
+    asserta(warna_aktif(WarnaAwal)),
+    cekInfo,
+    asserta(arah_permainan(kanan)).
